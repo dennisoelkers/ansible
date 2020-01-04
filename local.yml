@@ -1,6 +1,49 @@
 - hosts: localhost
   become: true
   tasks:
-  - name: Install htop
-    apt: name=htop
+  - name: Install essential packages
+    apt: 
+      pkg:
+      - htop
+      - vim
+      - zsh
+      - git
+      - gnupg
+      - mutt
+      - jq
+  - name: Install i3 and required packages
+    apt:
+      pkg:
+      - i3
+      - scrot
+      - dzen2
+      - nitrogen
+      - feh
+      - xautolock
+      - sakura
+      - redshift
+  - name: Install basic build toolchain
+    apt: name=build-essential
+  - name: Installing JDK & Maven
+    apt: 
+      name: 
+      - default-jdk-headless
+      - maven
+  - name: Install snap daemon
+    apt: name=snapd
+  - name: Install Chromium
+    snap: 
+      name:
+      - chromium
+      - chromium-ffmpeg
+  - name: Install IntelliJ IDEA Ultimate Edition
+    snap: name=intellij-idea-ultimate classic=true
+  - name: Install commonly used snaps
+    snap: 
+      name:
+      - robo3t-snap
+      - slack
+      - tusk
+      - noson
+      - insomnia
 
