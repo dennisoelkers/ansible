@@ -27,6 +27,11 @@
       - xautolock
       - sakura
       - redshift
+  - name: Add Regolith PPA
+    apt_repository:
+      repo: ppa:kgilmer/regolith-stable
+  - name: Install Regolith desktop
+    apt: name=regolith-desktop
   - name: Install basic build toolchain
     apt: name=build-essential
   - name: Installing JDK & Maven
