@@ -16,20 +16,9 @@
       - gnupg
       - mutt
       - jq
-  - name: Install i3 and required packages
-    apt:
-      pkg:
-      - i3
-      - scrot
-      - dzen2
-      - nitrogen
-      - feh
-      - xautolock
-      - sakura
-      - redshift
   - name: Add Regolith PPA
     apt_repository:
-      repo: ppa:kgilmer/regolith-stable
+      repo: ppa:regolith-linux/release
   - name: Install Regolith desktop
     apt: name=regolith-desktop
   - name: Install basic build toolchain
@@ -65,4 +54,8 @@
   - name: Install zoom
     apt:
       deb: https://zoom.us/client/latest/zoom_amd64.deb
+  - name: Checkout NVM (node version manager)
+    git:
+      repo: 'https://github.com/nvm-sh/nvm'
+      dest: /home/dennis/.nvm
 
