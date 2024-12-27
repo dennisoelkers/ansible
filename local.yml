@@ -16,6 +16,11 @@
       - gnupg
       - mutt
       - jq
+      - fzf
+      - direnv
+      - autojump
+      - delta
+      - pass
   - name: Add Regolith PPA
     apt_repository:
       repo: ppa:regolith-linux/release
