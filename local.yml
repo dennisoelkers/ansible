@@ -21,11 +21,10 @@
       - autojump
       - delta
       - pass
+      - peek
   - name: Add Regolith PPA
     apt_repository:
       repo: ppa:regolith-linux/release
-  - name: Install Regolith desktop
-    apt: name=regolith-desktop
   - name: Install basic build toolchain
     apt: name=build-essential
   - name: Installing JDK & Maven
@@ -33,29 +32,6 @@
       name: 
       - default-jdk-headless
       - maven
-  - name: Install snap daemon
-    apt: name=snapd
-  - name: Install Chromium
-    snap: 
-      name:
-      - chromium
-      - chromium-ffmpeg
-  - name: Install IntelliJ IDEA Ultimate Edition
-    snap: name=intellij-idea-ultimate classic=true
-  - name: Install Slack
-    snap: name=slack classic=true
-  - name: Install commonly used snaps
-    snap: 
-      name:
-      - robo3t-snap
-      - tusk
-      - noson
-      - insomnia
-  - name: Install zoom prerequisites
-    apt:
-      name:
-      - libxcb-xtest0
-      - libgl1-mesa-glx
   - name: Install zoom
     apt:
       deb: https://zoom.us/client/latest/zoom_amd64.deb
