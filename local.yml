@@ -9,6 +9,7 @@
   - name: Install essential packages
     apt: 
       pkg:
+      - curl
       - htop
       - vim
       - zsh
@@ -17,14 +18,17 @@
       - mutt
       - jq
       - fzf
+      - git-delta
       - direnv
       - autojump
-      - delta
       - pass
       - peek
-  - name: Add Regolith PPA
-    apt_repository:
-      repo: ppa:regolith-linux/release
+      - docker.io
+      - docker-compose-v2
+      - golang-docker-credential-helpers
+      - apt-transport-https
+      - python3-argcomplete
+      - flameshot
   - name: Install basic build toolchain
     apt: name=build-essential
   - name: Installing JDK & Maven
@@ -32,11 +36,68 @@
       name: 
       - default-jdk-headless
       - maven
-  - name: Install zoom
-    apt:
-      deb: https://zoom.us/client/latest/zoom_amd64.deb
-  - name: Checkout NVM (node version manager)
-    git:
-      repo: 'https://github.com/nvm-sh/nvm'
-      dest: /home/dennis/.nvm
+        #  - name: Install zoom
+        #    apt:
+        #      deb: https://zoom.us/client/latest/zoom_amd64.deb
+  - name: Set tunables for Intellij IDEA
+    ansible.builtin.copy:
+      src: 99-intellij-idea.conf
+      dest: /etc/sysctl.d/99-intellij-idea.conf
+      owner: root
+      group: root
+      mode: u+rw,g-wx,o-wx
+
+  - name: Apply tunables
+    ansible.builtin.command: sysctl -p --system
+
+  - name: Install Google Chrome
+    block:
+    - name: Install Google package signing key
+      ansible.builtin.apt_key:
+        url: https://dl-ssl.google.com/linux/linux_signing_key.pub
+        keyring: /etc/apt/keyrings/google.asc
+        state: present
+
+    - name: Install Google Repository
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main
+        filename: google-chrome
+        state: present
+
+    - name: Install Google Chrome package
+      apt:
+        pkg:
+          - google-chrome-stable
+
+  - name: Install Microsoft applications
+    block:
+    - name: Install Microsoft keyring
+      ansible.builtin.apt_key:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        keyring: /etc/apt/keyrings/packages.microsoft.gpg
+        state: present
+
+    - name: Install Repository
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main
+        state: present
+    - name: Install VSCode
+      apt:
+        pkg:
+          - code
+    - name: Install Intune Repository
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64 signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/ubuntu/24.04/prod noble main
+
+    - name: Install Intune
+      apt:
+        pkg:
+          - intune-portal
+
+  - name: Add user to docker group
+    ansible.builtin.user:
+      name: dennis
+      groups: docker
+      append: yes
+      shell: /usr/bin/zsh
 
