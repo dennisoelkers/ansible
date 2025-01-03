@@ -6,6 +6,12 @@
     git:
       repo: 'https://github.com/dennisoelkers/dotfiles.git'
       dest: /home/dennis/.dotfiles
+
+  - name: Adding own package repository
+    ansible.builtin.apt_repository:
+      repo: deb [trusted=yes] https://altneuland.k23.in/pkgs ./
+      state: present
+
   - name: Install essential packages
     apt: 
       pkg:
@@ -29,6 +35,9 @@
       - apt-transport-https
       - python3-argcomplete
       - flameshot
+      - ddcutil
+      - slack-desktop
+      - zoom
   - name: Install basic build toolchain
     apt: name=build-essential
   - name: Installing JDK & Maven
@@ -36,19 +45,26 @@
       name: 
       - default-jdk-headless
       - maven
-        #  - name: Install zoom
-        #    apt:
-        #      deb: https://zoom.us/client/latest/zoom_amd64.deb
-  - name: Set tunables for Intellij IDEA
+  - name: Adjust tunables for Intellij IDEA
+    block:
+    - name: Copy sysctl file 
+      ansible.builtin.copy:
+        src: 99-intellij-idea.conf
+        dest: /etc/sysctl.d/99-intellij-idea.conf
+        owner: root
+        group: root
+        mode: u+rw,g-wx,o-wx
+
+    - name: Apply tunables
+      ansible.builtin.command: sysctl -p --system
+
+  - name: Copy sudoers file for ddcutil
     ansible.builtin.copy:
-      src: 99-intellij-idea.conf
-      dest: /etc/sysctl.d/99-intellij-idea.conf
+      src: ddcutil
+      dest: /etc/sudoers.d
       owner: root
       group: root
-      mode: u+rw,g-wx,o-wx
-
-  - name: Apply tunables
-    ansible.builtin.command: sysctl -p --system
+      mode: u+rw,g-rwx,o-rwx
 
   - name: Install Google Chrome
     block:
@@ -100,4 +116,15 @@
       groups: docker
       append: yes
       shell: /usr/bin/zsh
+
+  - name: Enable sshd
+    block:
+      - name: Install OpenSSH
+        apt:
+          pkg:
+            - ssh
+      - name: Enable ssh service
+        ansible.builtin.service:
+          name: ssh
+          state: started
 
