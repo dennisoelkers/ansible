@@ -38,6 +38,7 @@
       - ddcutil
       - slack-desktop
       - zoom
+      - zfs-auto-snapshot
   - name: Install basic build toolchain
     apt: name=build-essential
   - name: Installing JDK & Maven
@@ -49,7 +50,7 @@
     block:
     - name: Copy sysctl file 
       ansible.builtin.copy:
-        src: 99-intellij-idea.conf
+        src: files/99-intellij-idea.conf
         dest: /etc/sysctl.d/99-intellij-idea.conf
         owner: root
         group: root
@@ -60,7 +61,7 @@
 
   - name: Copy sudoers file for ddcutil
     ansible.builtin.copy:
-      src: ddcutil
+      src: files/ddcutil
       dest: /etc/sudoers.d
       owner: root
       group: root
@@ -127,4 +128,25 @@
         ansible.builtin.service:
           name: ssh
           state: started
+
+
+  - name: Install Emacs package & dependencies
+    apt:
+      pkg:
+        - emacs
+        - ripgrep
+        - fd-find
+
+  - name: Installing AppArmor profile for IntelliJ
+    block:
+    - name: Copy profile
+      copy:
+        src: files/apparmor-intellij-idea-ultimate
+        dest: /etc/apparmor.d/intellij-idea-ultimate
+        owner: root
+        group: root
+        mode: u+rw,g-wx,o-wx
+    - name: Load profile
+      command:
+        cmd: apparmor_parser -r /etc/apparmor.d/intellij-idea-ultimate
 
